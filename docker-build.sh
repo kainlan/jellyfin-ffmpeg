@@ -523,9 +523,19 @@ pushd ${SOURCE_DIR}
 yes | mk-build-deps -i ${DEP_ARCH_OPT}
 dpkg-buildpackage -b -rfakeroot -us -uc ${BUILD_ARCH_OPT}
 
+mkdir comskipsrc
+cd comskipsrc 
+git clone -b kainlan-comskip https://github.com/kainlan/Comskip
+cd Comskip
+./autogen.sh
+PKG_CONFIG_PATH="/usr/lib/jellyfin-ffmpeg/lib:/usr/lib/jellyfin-ffmpeg/lib/mfx/pkgconfig" ./configure
+dpkg-buildpackage -b -rfakeroot -us -uc
+
+
 popd
 
 # Move the artifacts out
 mkdir -p ${ARTIFACT_DIR}/deb
+mv /jellyfin-ffmpeg/comskipsrc/Comskip{,5}_* ${ARTIFACT_DIR}/deb/
 mv /jellyfin-ffmpeg{,5}_* ${ARTIFACT_DIR}/deb/
 chown -Rc $(stat -c %u:%g ${ARTIFACT_DIR}) ${ARTIFACT_DIR}
